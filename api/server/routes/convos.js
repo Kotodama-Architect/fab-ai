@@ -4,6 +4,7 @@ const { CacheKeys, EModelEndpoint } = require('librechat-data-provider');
 const { getConvosByCursor, deleteConvos, getConvo, saveConvo } = require('~/models/Conversation');
 const { forkConversation, duplicateConversation } = require('~/server/utils/import/fork');
 const { storage, importFileFilter } = require('~/server/routes/files/multer');
+const { requireSubscription } = require('~/server/middleware');
 const requireJwtAuth = require('~/server/middleware/requireJwtAuth');
 const { importConversations } = require('~/server/utils/import');
 const { createImportLimiters } = require('~/server/middleware');
@@ -19,6 +20,7 @@ const assistantClients = {
 
 const router = express.Router();
 router.use(requireJwtAuth);
+router.use(requireSubscription);
 
 router.get('/', async (req, res) => {
   const limit = parseInt(req.query.limit, 10) || 25;
@@ -74,7 +76,7 @@ router.post('/gen_title', async (req, res) => {
     res.status(200).json({ title });
   } else {
     res.status(404).json({
-      message: 'Title not found or method not implemented for the conversation\'s endpoint',
+      message: "Title not found or method not implemented for the conversation's endpoint",
     });
   }
 });

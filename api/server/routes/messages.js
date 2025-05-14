@@ -9,7 +9,7 @@ const {
   deleteMessages,
 } = require('~/models');
 const { findAllArtifacts, replaceArtifactContent } = require('~/server/services/Artifacts/update');
-const { requireJwtAuth, validateMessageReq } = require('~/server/middleware');
+const { requireJwtAuth, validateMessageReq, requireSubscription } = require('~/server/middleware');
 const { cleanUpPrimaryKeyValue } = require('~/lib/utils/misc');
 const { getConvosQueried } = require('~/models/Conversation');
 const { countTokens } = require('~/server/utils');
@@ -18,6 +18,8 @@ const { logger } = require('~/config');
 
 const router = express.Router();
 router.use(requireJwtAuth);
+// fab-ai: Check for active subscription
+router.use(requireSubscription);
 
 router.get('/', async (req, res) => {
   try {

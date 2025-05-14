@@ -8,6 +8,7 @@ const {
   concurrentLimiter,
   messageUserLimiter,
   validateConvoAccess,
+  requireSubscription,
 } = require('~/server/middleware');
 const { isEnabled } = require('~/server/utils');
 const gptPlugins = require('./gptPlugins');
@@ -23,6 +24,7 @@ const router = express.Router();
 router.use(requireJwtAuth);
 router.use(checkBan);
 router.use(uaParser);
+router.use(requireSubscription);
 
 if (isEnabled(LIMIT_CONCURRENT_MESSAGES)) {
   router.use(concurrentLimiter);

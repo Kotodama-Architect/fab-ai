@@ -21,6 +21,9 @@ const AppService = require('./services/AppService');
 const staticCache = require('./utils/staticCache');
 const noIndex = require('./middleware/noIndex');
 const routes = require('./routes');
+// fab-ai: Import Stripe routes
+const stripeWebhookRoute = require('./routes/custom/webhook.stripe');
+const stripePortalRoute = require('./routes/custom/stripe.portal');
 
 const { PORT, HOST, ALLOW_SOCIAL_LOGIN, DISABLE_COMPRESSION, TRUST_PROXY } = process.env ?? {};
 
@@ -82,6 +85,9 @@ const startServer = async () => {
     configureSocialLogins(app);
   }
 
+  // fab-ai: Register Stripe webhook route before express.json middleware
+  app.use('/webhook/stripe', stripeWebhookRoute);
+
   app.use('/oauth', routes.oauth);
   /* API Endpoints */
   app.use('/api/auth', routes.auth);
@@ -110,6 +116,8 @@ const startServer = async () => {
   app.use('/api/agents', routes.agents);
   app.use('/api/banner', routes.banner);
   app.use('/api/bedrock', routes.bedrock);
+  // fab-ai: Register Stripe portal API
+  app.use('/api/stripe', stripePortalRoute);
 
   app.use('/api/tags', routes.tags);
 

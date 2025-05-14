@@ -32,6 +32,10 @@ export interface IUser extends Document {
   termsAccepted?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
+  // fab-ai: Stripe subscription fields
+  stripeCustomerId?: string;
+  stripeSubscriptionId?: string;
+  stripeSubscriptionStatus?: string;
 }
 
 // Session sub-schema
@@ -67,7 +71,7 @@ const User = new Schema<IUser>(
     },
     email: {
       type: String,
-      required: [true, 'can\'t be blank'],
+      required: [true, "can't be blank"],
       lowercase: true,
       unique: true,
       match: [/\S+@\S+\.\S+/, 'is invalid'],
@@ -155,6 +159,19 @@ const User = new Schema<IUser>(
     termsAccepted: {
       type: Boolean,
       default: false,
+    },
+    // fab-ai: Stripe subscription fields
+    stripeCustomerId: {
+      type: String,
+      sparse: true,
+    },
+    stripeSubscriptionId: {
+      type: String,
+      sparse: true,
+    },
+    stripeSubscriptionStatus: {
+      type: String,
+      sparse: true,
     },
   },
   { timestamps: true },

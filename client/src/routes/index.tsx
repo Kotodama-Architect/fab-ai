@@ -8,6 +8,7 @@ import {
   ApiErrorWatcher,
   TwoFactorScreen,
 } from '~/components/Auth';
+import { SubscriptionRequired, SubscriptionSuccess } from '~/components/SubscriptionRequired';
 import { AuthContextProvider } from '~/hooks/AuthContext';
 import RouteErrorBoundary from './RouteErrorBoundary';
 import StartupLayout from './Layouts/Startup';
@@ -72,6 +73,18 @@ export const router = createBrowserRouter([
             element: <TwoFactorScreen />,
           },
         ],
+      },
+      {
+        path: 'subscription',
+        element: <SubscriptionRequired />,
+      },
+      {
+        path: 'subscription/success',
+        element: <SubscriptionSuccess />,
+      },
+      {
+        path: 'subscription/cancel',
+        element: <Navigate to="/subscription" replace={true} />,
       },
       dashboardRoutes,
       {
