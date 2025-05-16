@@ -83,6 +83,7 @@ router.get('/', async function (req, res) {
       instanceProjectId: instanceProject._id.toString(),
       bundlerURL: process.env.SANDPACK_BUNDLER_URL,
       staticBundlerURL: process.env.SANDPACK_STATIC_BUNDLER_URL,
+      checkInvitationCode: !!process.env.SUBSCRIPTION_INVITATION_CODE,
     };
 
     if (ldap) {

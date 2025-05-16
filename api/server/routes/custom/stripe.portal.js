@@ -63,7 +63,12 @@ router.post('/create-checkout-session', requireJwtAuth, async (req, res) => {
     const cancelUrl = `${baseUrl}/subscription/cancel`;
 
     // Create a checkout session
-    const session = await stripeService.createCheckoutSession(user, successUrl, cancelUrl);
+    const session = await stripeService.createCheckoutSession(
+      user,
+      successUrl,
+      cancelUrl,
+      invitationCode,
+    );
 
     // Return the URL to the frontend
     res.json({ url: session.url });
@@ -80,6 +85,12 @@ router.get('/subscription-status', requireJwtAuth, async (req, res) => {
   try {
     const user = req.user;
 
+    if (!user || !user._id) {
+      logger.error('Error checking subscription status: User not found in request.');
+      // requireJwtAuth should prevent this, but as an extra safeguard
+      return res.status(401).json({ error: 'Unauthorized', message: 'User not authenticated.' });
+    }
+
     // Check if the user has an active subscription
     const hasActiveSubscription = await stripeService.hasActiveSubscription(user);
 
@@ -88,8 +99,8 @@ router.get('/subscription-status', requireJwtAuth, async (req, res) => {
       subscriptionStatus: user.stripeSubscriptionStatus || 'none',
     });
   } catch (error) {
-    logger.error('Error checking subscription status:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    logger.error('Error checking subscription status in /subscription-status endpoint:', error); // Log the specific error location
+    res.status(500).json({ error: 'Internal server error while checking subscription status' }); // More specific error message
   }
 });
 

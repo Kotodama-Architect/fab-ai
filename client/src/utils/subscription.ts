@@ -2,34 +2,26 @@
  * Utility functions for subscription management
  */
 
+import type { Router } from '@remix-run/router'; // Router型をインポート
+
 /**
  * Handle API responses that indicate a subscription is required
  *
  * @param error The error response from an API call
+ * @param router The react-router instance for navigation
  * @returns Boolean indicating if the error was handled (user redirected to subscription page)
  */
-export const handleSubscriptionRequired = (error: any): boolean => {
-  if (error?.status === 402 && error?.data?.subscription_required) {
-    // Get the base URL
-    const baseUrl = window.location.origin;
-
-    // Construct the URL with detailed error information if available
-    let subscriptionUrl = `${baseUrl}/subscription`;
-
-    if (error.data.details) {
-      // URL encode the details for safe passage in the URL
-      const encodedDetails = encodeURIComponent(error.data.details);
-      subscriptionUrl += `?message=${encodedDetails}`;
-    }
-
-    // Store the current URL to redirect back after subscription
-    sessionStorage.setItem('redirectAfterSubscription', window.location.pathname);
-
-    // Redirect to subscription page
-    window.location.href = subscriptionUrl;
+export const handleSubscriptionRequired = (error: any, router: Router): boolean => {
+  if (error?.response?.status === 402 && error?.response?.data?.subscription_required) {
+    console.warn('Subscription required, redirecting to /subscription:', error.response.data);
+    const { message, status, details } = error.response.data;
+    // Pass error details to the subscription page via state
+    router.navigate('/subscription', {
+      replace: true,
+      state: { errorDetails: { message, status, details } },
+    });
     return true;
   }
-
   return false;
 };
 

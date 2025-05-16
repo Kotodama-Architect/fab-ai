@@ -24,6 +24,7 @@ const checkBan = require('./checkBan');
 const noIndex = require('./noIndex');
 const roles = require('./roles');
 const requireSubscription = require('./requireSubscription');
+const validateSubscriptionInvitationCode = require('./validateSubscriptionInvitationCode');
 
 module.exports = {
   ...abortMiddleware,
@@ -52,4 +53,5 @@ module.exports = {
   validateImageRequest,
   validatePasswordReset,
   requireSubscription,
+  validateSubscriptionInvitationCode,
 };

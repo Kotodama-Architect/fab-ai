@@ -33,9 +33,11 @@ export interface IUser extends Document {
   createdAt?: Date;
   updatedAt?: Date;
   // fab-ai: Stripe subscription fields
-  stripeCustomerId?: string;
-  stripeSubscriptionId?: string;
-  stripeSubscriptionStatus?: string;
+  stripeCustomerId?: string | null;
+  stripeSubscriptionId?: string | null;
+  stripeSubscriptionStatus?: string | null;
+  hasActiveSubscription?: boolean;
+  processedEventIds?: string[];
 }
 
 // Session sub-schema
@@ -164,14 +166,25 @@ const User = new Schema<IUser>(
     stripeCustomerId: {
       type: String,
       sparse: true,
+      default: null,
     },
     stripeSubscriptionId: {
       type: String,
       sparse: true,
+      default: null,
     },
     stripeSubscriptionStatus: {
       type: String,
       sparse: true,
+      default: null,
+    },
+    hasActiveSubscription: {
+      type: Boolean,
+      default: false,
+    },
+    processedEventIds: {
+      type: [String],
+      default: [],
     },
   },
   { timestamps: true },

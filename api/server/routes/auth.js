@@ -28,6 +28,7 @@ const {
   resetPasswordLimiter,
   validateRegistration,
   validatePasswordReset,
+  validateSubscriptionInvitationCode,
 } = require('~/server/middleware');
 
 const router = express.Router();
@@ -50,6 +51,7 @@ router.post(
   registerLimiter,
   checkBan,
   checkInviteUser,
+  validateSubscriptionInvitationCode,
   validateRegistration,
   registrationController,
 );

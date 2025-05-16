@@ -55,10 +55,20 @@ const AuthContextProvider = ({
       //@ts-ignore - ok for token to be undefined initially
       setTokenHeader(token);
       setIsAuthenticated(isAuthenticated);
-      // Use a custom redirect if set
-      const finalRedirect = logoutRedirectRef.current || redirect;
-      // Clear the stored redirect
+
+      let finalRedirect = logoutRedirectRef.current || redirect;
       logoutRedirectRef.current = undefined;
+
+      // Subscription check
+      if (
+        isAuthenticated &&
+        user &&
+        user.role !== SystemRoles.ADMIN &&
+        !user.hasActiveSubscription // Assuming 'hasActiveSubscription' is available on the user object
+      ) {
+        finalRedirect = '/subscription';
+      }
+
       if (finalRedirect == null) {
         return;
       }
@@ -134,8 +144,13 @@ const AuthContextProvider = ({
     refreshToken.mutate(undefined, {
       onSuccess: (data: t.TRefreshTokenResponse | undefined) => {
         const { user, token = '' } = data ?? {};
-        if (token) {
+        console.log('AuthContext: refreshToken success, token:', token);
+        console.log('AuthContext: refreshToken success, typeof token:', typeof token);
+        if (token && typeof token === 'string') {
           setUserContext({ token, isAuthenticated: true, user });
+        } else if (token && typeof token !== 'string') {
+          console.error('AuthContext: refreshToken success, BUT token is NOT a string:', token);
+          navigate('/login');
         } else {
           console.log('Token is not present. User is not authenticated.');
           if (authConfig?.test === true) {
@@ -152,7 +167,7 @@ const AuthContextProvider = ({
         navigate('/login');
       },
     });
-  }, []);
+  }, [authConfig?.test, navigate, refreshToken, setUserContext]);
 
   useEffect(() => {
     if (userQuery.data) {

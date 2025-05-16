@@ -11,6 +11,24 @@
 
 # EXAMPLE: if you want to use the config file and the latest numbered release docker image the result will be:
 
+# docker compose -f docker-compose.yml -f docker-compose.override.yml up --build
+
+services:
+  # USE LIBRECHAT CONFIG FILE
+  api:
+    volumes:
+      - type: bind
+        source: ./librechat.yaml
+        target: /app/librechat.yaml
+    # LOCAL BUILD
+    image: fab-ai
+    env_file:
+      - .env
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: node
+
 # services:
 #   api:
 #     volumes:

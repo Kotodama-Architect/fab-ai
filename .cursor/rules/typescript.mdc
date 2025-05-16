@@ -1,0 +1,437 @@
+---
+description: 
+globs: *.tsx,*.ts
+alwaysApply: false
+---
+# Advanced TypeScript Engineering Standards
+
+## 1. Introduction and Objectives
+
+This framework establishes definitive standards for TypeScript development, designed to facilitate exceptional software engineering practices across both startup environments and enterprise-grade systems. These standards aim to achieve:
+
+- Creation of highly maintainable, self-documenting code
+- Maximization of TypeScript's type system capabilities for enhanced stability
+- Implementation of SOLID principles and established design patterns
+- Optimization of performance through intelligent application of language features
+- Reduction of unnecessary dependencies while leveraging TypeScript native capabilities
+- Standardization of file naming conventions using camelCase
+- Establishment of consistent coding practices that scale with project complexity
+
+## 2. Technology Stack and Rationale
+
+### Core Technologies
+
+- **TypeScript**: Leverage for its sophisticated type system including generics, conditional types, and literal types to enable early error detection and improve code maintainability.
+
+- **Node.js**: Utilize for its powerful asynchronous capabilities, with emphasis on native concurrency patterns such as Promise.all() to maximize performance in server-side operations.
+
+- **Zod**: Implement for runtime validation and schema definition to ensure type safety and robust data handling throughout the application lifecycle.
+
+### Dependency Management Philosophy
+
+- **Native Solutions Over External Libraries**: Prioritize modern TypeScript/JavaScript native functionality (Array methods, Object operations, etc.) over external utilities.
+
+- **Lodash Alternative Strategy**: Minimize use of Lodash in favor of:
+  - Native JavaScript/TypeScript methods
+  - ES modules with tree-shaking capabilities when external utilities are required
+  - Targeted micro-libraries that address specific needs without bloating the application
+
+## 3. Foundational Principles
+
+### 3.0 Verification-Driven Development
+
+- Consistently verify error output changes between code iterations using `pnpm run build-for-agent-debug`
+- Document all error modifications resulting from code changes as part of the development record
+- Prioritize error reduction and stability as primary metrics for code improvement
+- Implement systematic logging of errors across development phases to track quality evolution
+
+### 3.1 Code Clarity and Maintainability
+
+- Write immediately comprehensible code for any qualified engineer without requiring extensive documentation
+- Abstract implementation details appropriately, with clear interfaces exposed
+- Prioritize self-documenting naming conventions over extensive comments
+- Decompose complex logic into smaller, testable units with clear responsibilities
+
+### 3.2 Type Safety Excellence
+
+- Implement exhaustive type coverage across all system components
+- Utilize TypeScript's advanced type features (mapped types, conditional types, etc.) to model complex business logic
+- Restrict `any` type to exceptional circumstances with explicit justification
+- Employ Zod for runtime validation at system boundaries to ensure type safety for external data
+
+### 3.3 SOLID Architecture Implementation
+
+- **Single Responsibility**: Each class and function should have precisely one reason to change
+- **Open/Closed**: Components should be open for extension but closed for modification
+- **Liskov Substitution**: Derived types must be substitutable for their base types without altering program correctness
+- **Interface Segregation**: Clients should not be forced to depend on interfaces they do not use
+- **Dependency Inversion**: High-level modules should not depend on low-level modules; both should depend on abstractions
+
+### 3.4 Performance Optimization
+
+- Utilize asynchronous parallel processing capabilities where appropriate
+- Implement performance monitoring and benchmarking for critical system paths
+- Optimize type definitions to reduce runtime overhead while maintaining type safety
+- Employ memoization techniques for expensive computations with stable inputs
+- Implement intelligent caching strategies for frequently accessed data
+
+## 4. Coding Standards
+
+### 4.1 Naming Conventions
+
+- **Classes**: PascalCase (e.g., UserAuthentication)
+- **Interfaces**: PascalCase, without "I" prefix (e.g., HttpClient)
+- **Types**: PascalCase (e.g., UserCredentials)
+- **Variables, Functions, Methods**: camelCase (e.g., fetchUserData)
+- **Constants**: UPPERCASE_WITH_UNDERSCORES (e.g., MAX_RETRY_ATTEMPTS)
+- **File Names**: camelCase (e.g., userService.ts, apiClient.ts)
+- **Enums**: PascalCase for enum name, PascalCase for enum members (e.g., HttpStatusCode.InternalServerError)
+
+### 4.2 Function Design Principles
+
+- Name functions with verb-noun combinations that precisely describe their behavior
+- Implement arrow functions for concise operations without context binding requirements
+- Utilize parameter destructuring for improved readability and default value handling
+- Limit function parameters to a maximum of three; use object parameters for more complex signatures
+- Return early from functions to avoid deeply nested conditional blocks
+- Provide comprehensive JSDoc documentation for all public functions
+
+Example:
+
+```typescript
+/**
+ * Retrieves user information from the authentication service.
+ * 
+ * @param userId - Unique identifier for the user
+ * @param options - Additional configuration options
+ * @returns Promise resolving to user information or null if not found
+ * @throws {AuthenticationError} When authentication fails
+ */
+async function getUserInformation(
+  userId: string,
+  options: { includeProfile?: boolean; timeout?: number } = {}
+): Promise<UserInfo | null> {
+  const { includeProfile = false, timeout = 5000 } = options;
+  
+  // Implementation...
+}
+```
+
+### 4.3 Type and Interface Management
+
+- Define schemas using Zod before deriving TypeScript types to ensure runtime validation
+- Extract complex types into dedicated files for improved reusability
+- Implement discriminated unions for handling polymorphic data structures
+- Use readonly modifiers for immutable properties to prevent accidental mutation
+- Utilize type narrowing through type guards for enhanced type safety
+- Implement branded types for values that require additional runtime constraints
+
+Example:
+
+```typescript
+// Define schema first
+const userSchema = z.object({
+  id: z.string().uuid(),
+  email: z.string().email(),
+  role: z.enum(['admin', 'user', 'guest']),
+  createdAt: z.date()
+});
+
+// Derive type from schema
+type User = z.infer<typeof userSchema>;
+
+// Create branded type for additional safety
+type UserId = string & { readonly __brand: unique symbol };
+
+function createUserId(id: string): UserId {
+  if (!validateUuid(id)) {
+    throw new Error('Invalid user ID format');
+  }
+  return id as UserId;
+}
+```
+
+### 4.4 Code Review Checklist
+
+- Verify type safety and appropriate use of TypeScript features
+- Confirm adherence to SOLID principles and design patterns
+- Evaluate performance implications, especially for critical paths
+- Ensure proper error handling and edge case management
+- Verify test coverage for all business logic and edge cases
+- Confirm documentation completeness and accuracy
+- Assess code readability and naming convention adherence
+- Evaluate dependency management and potential optimizations
+
+### 4.5 Documentation Standards
+
+- Implement comprehensive JSDoc for all public APIs and complex functions
+- Maintain up-to-date README files with clear setup and usage instructions
+- Document architectural decisions and trade-offs in dedicated ADR (Architecture Decision Record) files
+- Include visual diagrams for complex workflows or system interactions
+- Provide examples for non-obvious implementations or API usage
+- Document performance characteristics and potential bottlenecks
+
+## 5. Native Solutions vs. External Libraries
+
+### 5.1 Modern JavaScript/TypeScript Capabilities
+
+Modern JavaScript/TypeScript provides numerous native capabilities that eliminate the need for external libraries:
+
+- **Array Operations**: map, filter, reduce, find, every, some
+- **Object Manipulation**: Object.entries, Object.values, Object.keys, Object.fromEntries
+- **String Processing**: Template literals, string methods (includes, startsWith, endsWith)
+- **Asynchronous Processing**: Promises, async/await, Promise.all, Promise.allSettled
+- **Functional Programming**: Arrow functions, higher-order functions, closures
+
+### 5.2 Recommended Alternatives to Lodash
+
+When native solutions are insufficient, consider these alternatives:
+
+- **For Functional Programming**: fp-ts (for advanced functional programming)
+- **For Data Manipulation**: Ramda (tree-shakable functional utilities)
+- **For Specific Utilities**: lodash-es (individual imports for tree-shaking)
+
+### 5.3 Implementation Guidelines
+
+- Import only the specific functions needed rather than entire libraries
+- Benchmark performance implications of library usage versus native implementations
+- Create utility functions for commonly used operations to maintain consistency
+- Document the rationale for including external libraries in the codebase
+
+## 6. TypeScript Advanced Features for Stability and Performance
+
+### 6.1 Type System Optimization
+
+- Implement strict null checks to prevent null reference errors
+- Utilize discriminated unions for type-safe handling of different states
+- Implement advanced type inference to reduce manual type annotations
+- Use conditional types to model complex business logic in the type system
+- Leverage mapped types for transforming existing types into new forms
+
+Example:
+
+```typescript
+// Using mapped types for transformation
+type ReadonlyDeep<T> = {
+  readonly [P in keyof T]: T[P] extends object ? ReadonlyDeep<T[P]> : T[P];
+};
+
+// Using conditional types for complex logic
+type ExtractPromiseType<T> = T extends Promise<infer U> ? U : never;
+```
+
+### 6.2 Performance Optimization Techniques
+
+- Implement proper type guards to avoid unnecessary type casting
+- Use const assertions for literal values to enable better type inference
+- Leverage tuple types for fixed-length arrays with known types
+- Implement template literal types for string manipulation at the type level
+- Utilize the `as const` assertion to create readonly tuple types
+
+Example:
+
+```typescript
+// Using const assertions for better type inference
+const config = {
+  apiEndpoint: 'https://api.example.com',
+  timeout: 5000,
+  retryCount: 3
+} as const;
+
+// Type is now readonly with literal values
+// { readonly apiEndpoint: "https://api.example.com"; readonly timeout: 5000; readonly retryCount: 3; }
+```
+
+### 6.3 Continuous Improvement Framework
+
+- Establish a process for evaluating and adopting new TypeScript features
+- Implement automated tools for measuring type coverage and identifying issues
+- Create a knowledge sharing mechanism for disseminating best practices
+- Incorporate regular refactoring sessions to improve existing code
+- Maintain a library of reusable type definitions for common patterns
+
+## 7. Implementation Workflow and Design Patterns
+
+### 7.1 Feature Development Process
+
+1. **Requirement Analysis**
+   - Define clear acceptance criteria
+   - Identify data structures and transformations
+   - Document edge cases and error scenarios
+
+2. **Architecture Design**
+   - Identify components and their interactions
+   - Define interfaces and abstractions
+   - Establish error handling strategy
+
+3. **Pseudocode Implementation**
+   - Create high-level algorithm descriptions
+   - Document complex logic flows
+   - Identify potential performance bottlenecks
+
+4. **Type Definition**
+   - Define Zod schemas for data validation
+   - Create TypeScript interfaces/types for all components
+   - Document type constraints and assumptions
+
+5. **Implementation**
+   - Develop components following established patterns
+   - Implement comprehensive error handling
+   - Add detailed JSDoc comments
+
+6. **Testing**
+   - Write unit tests for business logic
+   - Implement integration tests for component interactions
+   - Include edge case and error scenario testing
+
+7. **Code Review**
+   - Evaluate against established standards
+   - Assess performance implications
+   - Verify documentation completeness
+
+### 7.2 Recommended Design Patterns
+
+- **Repository Pattern**: For data access abstraction
+- **Factory Pattern**: For complex object creation
+- **Strategy Pattern**: For interchangeable algorithms
+- **Observer Pattern**: For event-driven architectures
+- **Command Pattern**: For operation encapsulation
+- **Adapter Pattern**: For interface compatibility
+- **Decorator Pattern**: For dynamic behavior extension
+
+### 7.3 Implementation Example
+
+```typescript
+/**
+ * UserService implementation using the Repository pattern
+ * Demonstrates proper error handling, async/await usage, and type safety
+ */
+
+// Schema definition
+const userSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string().min(1),
+  email: z.string().email(),
+  role: z.enum(['admin', 'user', 'guest']),
+  createdAt: z.date()
+});
+
+// Type inference
+type User = z.infer<typeof userSchema>;
+
+// Repository interface
+interface UserRepository {
+  findById(id: string): Promise<User | null>;
+  findByEmail(email: string): Promise<User | null>;
+  create(user: Omit<User, 'id' | 'createdAt'>): Promise<User>;
+  update(id: string, userData: Partial<Omit<User, 'id' | 'createdAt'>>): Promise<User>;
+  delete(id: string): Promise<boolean>;
+}
+
+// Service implementation
+class UserService {
+  private repository: UserRepository;
+  
+  constructor(repository: UserRepository) {
+    this.repository = repository;
+  }
+  
+  /**
+   * Retrieves a user by their email address
+   * 
+   * @param email - User's email address
+   * @returns The user object if found
+   * @throws {NotFoundError} When user doesn't exist
+   * @throws {ValidationError} When email format is invalid
+   */
+  async getUserByEmail(email: string): Promise<User> {
+    // Validate input
+    try {
+      z.string().email().parse(email);
+    } catch (error) {
+      throw new ValidationError('Invalid email format', { cause: error });
+    }
+    
+    // Retrieve user
+    const user = await this.repository.findByEmail(email);
+    if (!user) {
+      throw new NotFoundError(`User with email ${email} not found`);
+    }
+    
+    return user;
+  }
+  
+  /**
+   * Creates a new user with validation
+   * 
+   * @param userData - User data without id and createdAt
+   * @returns Newly created user
+   * @throws {ValidationError} When user data is invalid
+   * @throws {ConflictError} When user with email already exists
+   */
+  async createUser(userData: Omit<User, 'id' | 'createdAt'>): Promise<User> {
+    // Check for existing user
+    const existingUser = await this.repository.findByEmail(userData.email);
+    if (existingUser) {
+      throw new ConflictError(`User with email ${userData.email} already exists`);
+    }
+    
+    // Create user
+    return this.repository.create(userData);
+  }
+}
+```
+
+## 8. Contextual Application and Implementation Philosophy
+
+These standards represent a comprehensive framework that should be applied with consideration for project context, development phase, and business requirements. When implementing these guidelines:
+
+- **Consider Project Scale**: Apply appropriate levels of abstraction based on project size and complexity—avoid overengineering small projects with patterns better suited for enterprise systems
+- **Respect Development Phase**: Early prototyping may prioritize velocity over complete type coverage; mature products should emphasize stability and maintainability
+- **Balance Technical Purity with Pragmatism**: Perfect adherence to principles should not compromise delivery timelines or introduce unnecessary complexity
+- **Recognize Team Capabilities**: Standards implementation should account for team expertise and provide appropriate guidance for skills development
+
+By adhering to these principles with contextual awareness, engineers can create systems that are:
+
+- **Maintainable**: Easy to understand, modify, and extend
+- **Reliable**: Robust against errors and edge cases
+- **Performant**: Optimized for execution speed and resource utilization
+- **Scalable**: Able to grow with increasing demands
+- **Secure**: Protected against common vulnerabilities
+
+The continued evolution of these standards should be driven by practical experience, emerging best practices, and advancements in the TypeScript ecosystem. Engineers are encouraged to approach each implementation with a mindset of continuous improvement, regularly questioning assumptions and seeking the appropriate solution for the specific challenge at hand.
+
+## 9. Cursor-Specific Integrations and Contextual Management
+
+### 9.0 Context-Aware Development
+
+- **Requirement Alignment**: Adjust implementation complexity based on business requirements and project lifecycle
+- **Progressive Enhancement**: Start with simpler implementations that can be refined as requirements mature
+- **Technical Debt Management**: Document intentional trade-offs with `// @cursor-debt` tags for future refactoring
+- **Complexity Justification**: Include explanatory comments when implementing advanced patterns that might not be immediately intuitive
+
+### 9.1 Mandatory Debug Verification Process
+
+- **Continuous Error Monitoring**: Always utilize `pnpm run build-for-agent-debug` before and after any code modifications to verify changes in error output
+- **Error Comparison Protocol**: Document and compare error outputs systematically between iterations to ensure code quality improvements
+- **Error Regression Prevention**: Maintain a record of known errors that have been addressed to prevent their reintroduction
+- **AI Assistance**: Utilize `// @cursor-advice` comments to request AI assistance on complex sections
+- **Code Generation**: Implement `// @cursor-generate-test` comments to request test generation for functions
+
+### 9.2 Cursor Configuration
+
+- Configure `.cursorrc` to enforce the TypeScript standards defined in this document
+- Enable strict type checking in Cursor settings with `"typescript.enableStrictChecking": true`
+- Set up auto-fix on save with `"editor.codeActionsOnSave": { "source.fixAll.eslint": true }`
+- Configure snippet templates that align with the coding standards
+
+### 9.3 Cursor Workflow Integration
+
+- Utilize Cursor's AI capabilities for code review against these standards
+- Implement custom snippets for standard patterns (repository implementations, error handling, etc.)
+- Configure Cursor to highlight potential SOLID principle violations
+- Set up keyboard shortcuts for common refactoring patterns
+
+※**ただし、利用しているパッケージの実装の中には、型サポートが、完全では無いモノが存在している場合がある事を認識し、理解した上で、適切に対応してください。また、その背景に対応して、system内での利用方法の、ベストプラクティスがどの様に定義されているかを常に、把握し、理解した上で、実装を行ってください。**
+
+※**既存の実装において、利用すべき共通処理や処理同士に存在する依存関係を考慮してください。改善や修正が、常に適切かどうかを振り返りながら、既存の処理と重複したり、競合したり、不必要な実装を生成しない様にしましょう。**
