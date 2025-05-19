@@ -31,6 +31,8 @@ import type {
 } from 'librechat-data-provider';
 import type { ConversationCursorData } from '~/utils/convos';
 import { findConversationInInfinite } from '~/utils';
+import { getSubscriptionStatus } from '~/services/stripe';
+import type { SubscriptionStatus } from '~/services/stripe';
 
 export const useGetPresetsQuery = (
   config?: UseQueryOptions<TPreset[]>,
@@ -536,4 +538,20 @@ export const useUserTermsQuery = (
     refetchOnMount: false,
     ...config,
   });
+};
+
+export const useGetSubscriptionStatusQuery = (
+  token?: string,
+  config?: UseQueryOptions<SubscriptionStatus>,
+): QueryObserverResult<SubscriptionStatus> => {
+  return useQuery<SubscriptionStatus>(
+    [QueryKeys.subscriptionStatus, token],
+    () => getSubscriptionStatus(token),
+    {
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      refetchOnMount: true,
+      ...config,
+    },
+  );
 };

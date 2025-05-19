@@ -19,6 +19,8 @@ const publicSharedLinksEnabled =
   (process.env.ALLOW_SHARED_LINKS_PUBLIC === undefined ||
     isEnabled(process.env.ALLOW_SHARED_LINKS_PUBLIC));
 
+const allowViewerRegistration = isEnabled(process.env.ALLOW_VIEWER_REGISTRATION);
+
 router.get('/', async function (req, res) {
   const cache = getLogStores(CacheKeys.CONFIG_STORE);
   const cachedStartupConfig = await cache.get(CacheKeys.STARTUP_CONFIG);
@@ -84,6 +86,7 @@ router.get('/', async function (req, res) {
       bundlerURL: process.env.SANDPACK_BUNDLER_URL,
       staticBundlerURL: process.env.SANDPACK_STATIC_BUNDLER_URL,
       checkInvitationCode: !!process.env.SUBSCRIPTION_INVITATION_CODE,
+      allowViewerRegistration,
     };
 
     if (ldap) {

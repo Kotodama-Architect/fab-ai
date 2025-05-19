@@ -25,6 +25,8 @@ const routes = require('./routes');
 const stripeWebhookRoute = require('./routes/custom/webhook.stripe');
 const stripePortalRoute = require('./routes/custom/stripe.portal');
 
+const authViewerRoutes = require('./routes/authViewer');
+
 const { PORT, HOST, ALLOW_SOCIAL_LOGIN, DISABLE_COMPRESSION, TRUST_PROXY } = process.env ?? {};
 
 const port = Number(PORT) || 3080;
@@ -91,6 +93,7 @@ const startServer = async () => {
   app.use('/oauth', routes.oauth);
   /* API Endpoints */
   app.use('/api/auth', routes.auth);
+  app.use('/api/auth/viewer', authViewerRoutes);
   app.use('/api/actions', routes.actions);
   app.use('/api/keys', routes.keys);
   app.use('/api/user', routes.user);

@@ -8,11 +8,22 @@ const { logger } = require('~/config');
  */
 class StripeService {
   constructor(apiKey, webhookSecret, priceId, successUrl, cancelUrl) {
-    if (!apiKey || !webhookSecret || !priceId || !successUrl || !cancelUrl) {
-      throw new Error(
-        'StripeService: Missing one or more required constructor arguments: apiKey, webhookSecret, priceId, successUrl, cancelUrl',
-      );
+    if (!apiKey) {
+      throw new Error('StripeService: Missing apiKey');
     }
+    if (!webhookSecret) {
+      throw new Error('StripeService: Missing webhookSecret');
+    }
+    if (!priceId) {
+      throw new Error('StripeService: Missing priceId');
+    }
+    if (!successUrl) {
+      throw new Error('StripeService: Missing successUrl');
+    }
+    if (!cancelUrl) {
+      throw new Error('StripeService: Missing cancelUrl');
+    }
+
     this.stripe = require('stripe')(apiKey);
     this.webhookSecret = webhookSecret;
     this.priceId = priceId;
@@ -337,14 +348,46 @@ class StripeService {
   }
 }
 
-// Instantiate the service with environment variables
-const stripeServiceInstance = new StripeService(
-  process.env.STRIPE_SECRET_KEY,
-  process.env.STRIPE_WEBHOOK_SECRET,
-  process.env.STRIPE_PRICE_ID,
-  process.env.STRIPE_SUCCESS_URL,
-  process.env.STRIPE_CANCEL_URL,
-);
+const {
+  STRIPE_API_KEY,
+  STRIPE_WEBHOOK_SECRET,
+  STRIPE_PRICE_ID,
+  STRIPE_SUCCESS_URL,
+  STRIPE_CANCEL_URL,
+} = process.env;
 
-module.exports = stripeServiceInstance;
-// module.exports = new StripeService(); // Old instantiation removed
+if (
+  !STRIPE_API_KEY ||
+  !STRIPE_WEBHOOK_SECRET ||
+  !STRIPE_PRICE_ID
+) {
+  logger.warn(
+    '[StripeService] Missing one or more required Stripe environment variables (STRIPE_API_KEY, STRIPE_WEBHOOK_SECRET, STRIPE_PRICE_ID). Stripe functionality will be disabled or limited.',
+  );
+  module.exports = {
+    hasActiveSubscription: async () => false,
+    createCheckoutSession: async () => {
+      throw new Error('Stripe not configured');
+    },
+    createCustomerPortalSession: async () => {
+      throw new Error('Stripe not configured');
+    },
+    handleWebhookEvent: async () => {
+      logger.warn('Stripe not configured, webhook ignored');
+    },
+    verifyWebhookSignature: () => false,
+    getDbUserFromEvent: async () => null, // Ensure all methods expected by routes are present
+    _handleSubscriptionUpdate: async () => {},
+    isConfigured: false,
+  };
+} else {
+  const serviceInstance = new StripeService(
+    STRIPE_API_KEY,
+    STRIPE_WEBHOOK_SECRET,
+    STRIPE_PRICE_ID,
+    STRIPE_SUCCESS_URL || '', // Defaulting to empty string as routes provide specific URLs
+    STRIPE_CANCEL_URL || '',  // Defaulting to empty string
+  );
+  serviceInstance.isConfigured = true;
+  module.exports = serviceInstance;
+}

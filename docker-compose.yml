@@ -67,6 +67,18 @@ services:
       - vectordb
     env_file:
       - .env
+  mongo-express:
+    container_name: mongo-express
+    image: mongo-express
+    environment:
+      ME_CONFIG_MONGODB_SERVER: mongodb
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: password
+    ports:
+      - '8081:8081'
+    depends_on:
+      - mongodb
+    restart: always
 
 volumes:
   pgdata2:

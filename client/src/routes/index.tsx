@@ -7,6 +7,8 @@ import {
   VerifyEmail,
   ApiErrorWatcher,
   TwoFactorScreen,
+  ViewerLogin,
+  ViewerRegistration,
 } from '~/components/Auth';
 import { SubscriptionRequired, SubscriptionSuccess } from '~/components/SubscriptionRequired';
 import { AuthContextProvider } from '~/hooks/AuthContext';
@@ -40,6 +42,14 @@ export const router = createBrowserRouter([
       {
         path: 'register',
         element: <Registration />,
+      },
+      {
+        path: 'auth/viewer/login',
+        element: <ViewerLogin />,
+      },
+      {
+        path: 'auth/viewer/register',
+        element: <ViewerRegistration />,
       },
       {
         path: 'forgot-password',

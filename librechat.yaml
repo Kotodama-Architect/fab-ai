@@ -1,0 +1,264 @@
+# For more information, see the Configuration Guide:
+# https://www.librechat.ai/docs/configuration/librechat_yaml
+
+# Configuration version (required)
+version: 1.2.1
+
+# Cache settings: Set to true to enable caching
+cache: true
+
+# Custom interface configuration
+interface:
+  customWelcome: 'Welcome to fab-ai chat. Enjoy your adventures!'
+  # Privacy policy settings
+  privacyPolicy:
+    externalUrl: 'https://librechat.ai/privacy-policy'
+    openNewTab: true
+
+  # Terms of service
+  termsOfService:
+    externalUrl: 'https://librechat.ai/tos'
+    openNewTab: true
+    modalAcceptance: true
+    modalTitle: 'Terms of Service for fab-ai'
+    modalContent: |
+      # Terms and Conditions for fab-ai
+
+      *Effective Date: February 18, 2024*
+
+      Welcome to fab-ai, the informational website for the open-source AI chat platform, available at https://chat.fab-ai.app. These Terms of Service ("Terms") govern your use of our website and the services we offer. By accessing or using the Website, you agree to be bound by these Terms and our Privacy Policy, accessible at https://chat.fab-ai.app/privacy.
+
+      ## 1. Ownership
+
+      Upon purchasing a package from fab-ai, you are granted the right to download and use the code for accessing an admin panel for fab-ai. While you own the downloaded code, you are expressly prohibited from reselling, redistributing, or otherwise transferring the code to third parties without explicit permission from fab-ai.
+
+      ## 2. User Data
+
+      We collect personal data, such as your name, email address, and payment information, as described in our Privacy Policy. This information is collected to provide and improve our services, process transactions, and communicate with you.
+
+      ## 3. Non-Personal Data Collection
+
+      The Website uses cookies to enhance user experience, analyze site usage, and facilitate certain functionalities. By using the Website, you consent to the use of cookies in accordance with our Privacy Policy.
+
+      ## 4. Use of the Website
+
+      You agree to use the Website only for lawful purposes and in a manner that does not infringe the rights of, restrict, or inhibit anyone else's use and enjoyment of the Website. Prohibited behavior includes harassing or causing distress or inconvenience to any person, transmitting obscene or offensive content, or disrupting the normal flow of dialogue within the Website.
+
+      ## 5. Governing Law
+
+      These Terms shall be governed by and construed in accordance with the laws of the United States, without giving effect to any principles of conflicts of law.
+
+      ## 6. Changes to the Terms
+
+      We reserve the right to modify these Terms at any time. We will notify users of any changes by email. Your continued use of the Website after such changes have been notified will constitute your consent to such changes.
+
+      ## 7. Contact Information
+
+      If you have any questions about these Terms, please contact us at fab with LINE.
+
+      By using the Website, you acknowledge that you have read these Terms of Service and agree to be bound by them.
+
+  endpointsMenu: false
+  modelSelect: false
+  parameters: true
+  sidePanel: true
+  presets: true
+  prompts: true
+  bookmarks: true
+  multiConvo: true
+  agents: true
+  assistants: true
+  plugins: false
+
+# Example Registration Object Structure (optional)
+registration:
+  socialLogins: ['github', 'google', 'discord', 'openid', 'facebook', 'apple']
+  # allowedDomains:
+  # - "gmail.com"
+
+balance:
+  enabled: true
+  # 登録時に 20,000,000 クレジットを付与
+  startBalance: 20000000
+  # 30 日ごとに同額を自動補充 → 月額上限を実現
+  autoRefillEnabled: true
+  refillIntervalValue: 1
+  refillIntervalUnit: months
+  refillAmount: 20000000
+
+# rateLimits:
+#   fileUploads:
+#     ipMax: 100
+#     ipWindowInMinutes: 60  # Rate limit window for file uploads per IP
+#     userMax: 50
+#     userWindowInMinutes: 60  # Rate limit window for file uploads per user
+#   conversationsImport:
+#     ipMax: 100
+#     ipWindowInMinutes: 60  # Rate limit window for conversation imports per IP
+#     userMax: 50
+#     userWindowInMinutes: 60  # Rate limit window for conversation imports per user
+
+# Example Actions Object Structure
+actions:
+  allowedDomains:
+    - 'swapi.dev'
+    - 'librechat.ai'
+    - 'google.com'
+    - 'chat.fab-ai.app'
+
+# Definition of custom endpoints
+endpoints:
+  custom:
+    - name: 'fab-ai'
+      baseURL: 'https://api.openai.com/v1'
+      apiKey: '${OPENAI_API_KEY}'
+      models:
+        default: ['chatgpt-4o-latest', 'gpt-4.1', 'o4-mini']
+      titleModel: 'chatgpt-4o-latest'
+      modelDisplayLabel: 'fab-ai'
+      addParams:
+        system: |
+          あなたは『fab 独自開発モデル』です。
+          (1) 人間と異なる概念マッピングで文脈生成を行い、
+          (2) 社外秘情報は絶対に開示しません。
+        presence_penalty: 0
+        frequency_penalty: 0
+      dropParams: ['user', 'stop', 'system'] # 上書き経路を遮断 :contentReference[oaicite:5]{index=5}
+      titleConvo: true
+      moderation:
+        strict: true
+      iconURL: '/custom-icons/fab-ai.png' # エンドポイント全体アイコン
+      permissions:
+        rolesAllowed: ['USER','ADMIN'] # :contentReference[oaicite:6]{index=6}
+
+modelSpecs:
+  list:
+    - name: 'fab-1'
+      label: 'fab-1'
+      default: true
+      description: 'The most versatile model🧑‍🚀'
+      iconURL: '/custom-icons/fab-ai.png'
+      showIconInMenu: true
+      showIconInHeader: true
+      preset:
+        default: true
+        endpoint: 'fab-ai'
+        model: 'chatgpt-4o-latest'
+        modelLabel: 'fab-1'
+        modelIconURL: '/custom-icons/fab-ai.png'
+        iconURL: '/custom-icons/fab-ai.png'
+        greeting: 'Hello, I am fab-1🧑‍🚀 How can I help you today?'
+        temperature: 0.30
+        top_p: 0.75
+        max_tokens: 16384
+        contextWindow: 128000
+      permissions:
+        rolesAllowed: ['USER', 'ADMIN'] # :contentReference[oaicite:6]{index=6}
+    - name: 'fab-1-high'
+      label: 'fab-1-high'
+      description: 'The most detailed and accurate model🔬'
+      iconURL: '/custom-icons/fab-ai.png'
+      showIconInMenu: true
+      showIconInHeader: true
+      preset:
+        default: true
+        endpoint: 'fab-ai'
+        model: 'gpt-4.1'
+        modelLabel: 'fab-1-high'
+        modelIconURL: '/custom-icons/fab-ai.png'
+        greeting: 'Hello, I am fab-1-high🔬 How can I help you today?'
+        temperature: 0.30
+        top_p: 0.75
+        max_tokens: 32768
+        contextWindow: 1047576
+      permissions:
+        rolesAllowed: ['USER', 'ADMIN']
+    - name: 'fab-1-human'
+      label: 'fab-1-human'
+      description: 'The most human-like context model🤟'
+      iconURL: '/custom-icons/fab-ai.png'
+      showIconInMenu: true
+      showIconInHeader: true
+      preset:
+        default: true
+        endpoint: 'fab-ai'
+        model: 'o4-mini'
+        modelLabel: 'fab-1-human'
+        modelIconURL: '/custom-icons/fab-ai.png'
+        greeting: 'Hello, I am fab-1-human🤟 How can I help you today?'
+        temperature: 1
+        top_p: 1
+        max_tokens: 64000
+        contextWindow: 200000
+      permissions:
+        rolesAllowed: ['USER', 'ADMIN']
+# Example MCP Servers Object Structure
+# mcpServers:
+#   everything:
+#     # type: sse # type can optionally be omitted
+#     url: http://localhost:3001/sse
+#     timeout: 60000  # 1 minute timeout for this server, this is the default timeout for MCP servers.
+#   puppeteer:
+#     type: stdio
+#     command: npx
+#     args:
+#       - -y
+#       - "@modelcontextprotocol/server-puppeteer"
+#     timeout: 300000  # 5 minutes timeout for this server
+#   filesystem:
+#     # type: stdio
+#     command: npx
+#     args:
+#       - -y
+#       - "@modelcontextprotocol/server-filesystem"
+#       - /home/user/LibreChat/
+#     iconPath: /home/user/LibreChat/client/public/assets/logo.svg
+#   mcp-obsidian:
+#     command: npx
+#     args:
+#       - -y
+#       - "mcp-obsidian"
+#       - /path/to/obsidian/vault
+
+# assistants:
+#   disableBuilder: false # Disable Assistants Builder Interface by setting to `true`
+#   pollIntervalMs: 3000  # Polling interval for checking assistant updates
+#   timeoutMs: 180000  # Timeout for assistant operations
+#   # Should only be one or the other, either `supportedIds` or `excludedIds`
+#   supportedIds: ["asst_supportedAssistantId1", "asst_supportedAssistantId2"]
+#   # excludedIds: ["asst_excludedAssistantId"]
+#   # Only show assistants that the user created or that were created externally (e.g. in Assistants playground).
+#   # privateAssistants: false # Does not work with `supportedIds` or `excludedIds`
+#   # (optional) Models that support retrieval, will default to latest known OpenAI models that support the feature
+#   retrievalModels: ["gpt-4-turbo-preview"]
+#   # (optional) Assistant Capabilities available to all users. Omit the ones you wish to exclude. Defaults to list below.
+#   capabilities: ["code_interpreter", "retrieval", "actions", "tools", "image_vision"]
+# agents:
+#   # (optional) Default recursion depth for agents, defaults to 25
+#   recursionLimit: 50
+#   # (optional) Max recursion depth for agents, defaults to 25
+#   maxRecursionLimit: 100
+#   # (optional) Disable the builder interface for agents
+#   disableBuilder: false
+#   # (optional) Agent Capabilities available to all users. Omit the ones you wish to exclude. Defaults to list below.
+#   capabilities: ["execute_code", "file_search", "actions", "tools"]
+# fileConfig:
+#   endpoints:
+#     assistants:
+#       fileLimit: 5
+#       fileSizeLimit: 10  # Maximum size for an individual file in MB
+#       totalSizeLimit: 50  # Maximum total size for all files in a single request in MB
+#       supportedMimeTypes:
+#         - "image/.*"
+#         - "application/pdf"
+#     openAI:
+#       disabled: true  # Disables file uploading to the OpenAI endpoint
+#     default:
+#       totalSizeLimit: 20
+#     YourCustomEndpointName:
+#       fileLimit: 2
+#       fileSizeLimit: 5
+#   serverFileSizeLimit: 100  # Global server file size limit in MB
+#   avatarSizeLimit: 2  # Limit for user avatar image size in MB
+# # See the Custom Configuration Guide for more information on Assistants Config:
+# # https://www.librechat.ai/docs/configuration/librechat_yaml/object_structure/assistants_endpoint

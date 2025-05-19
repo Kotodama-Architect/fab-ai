@@ -26,11 +26,13 @@ const edit = require('./edit');
 const keys = require('./keys');
 const user = require('./user');
 const ask = require('./ask');
+const authViewer = require('./authViewer');
 
 module.exports = {
   ask,
   edit,
   auth,
+  authViewer,
   keys,
   user,
   tags,

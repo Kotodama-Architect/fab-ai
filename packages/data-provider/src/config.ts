@@ -542,6 +542,7 @@ export type TStartupConfig = {
   instanceProjectId: string;
   bundlerURL?: string;
   staticBundlerURL?: string;
+  allowViewerRegistration?: boolean;
 };
 
 export enum OCRStrategy {

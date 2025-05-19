@@ -9,6 +9,7 @@ const {
   deleteSharedLink,
 } = require('~/models/Share');
 const requireJwtAuth = require('~/server/middleware/requireJwtAuth');
+const requireUserOrViewerAuth = require('~/server/middleware/requireUserOrViewerAuth');
 const { isEnabled } = require('~/server/utils');
 const router = express.Router();
 
@@ -24,7 +25,7 @@ if (allowSharedLinks) {
     isEnabled(process.env.ALLOW_SHARED_LINKS_PUBLIC);
   router.get(
     '/:shareId',
-    allowSharedLinksPublic ? (req, res, next) => next() : requireJwtAuth,
+    allowSharedLinksPublic ? (req, res, next) => next() : requireUserOrViewerAuth,
     async (req, res) => {
       try {
         const share = await getSharedMessages(req.params.shareId);

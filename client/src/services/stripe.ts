@@ -31,7 +31,7 @@ async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
 
 // --- APIサービス関数 ---
 
-interface SubscriptionStatus {
+export interface SubscriptionStatus {
   // サブスクリプション状態に応じて必要なプロパティを定義
   // 例: isActive: boolean, planName: string, etc.
   [key: string]: any; // 実際のレスポンス構造に合わせて調整
@@ -50,16 +50,16 @@ export const getSubscriptionStatus = async (token?: string): Promise<Subscriptio
   return request<SubscriptionStatus>('/subscription-status', { method: 'GET', headers });
 };
 
-interface CreateCheckoutSessionPayload {
+export interface CreateCheckoutSessionPayload {
   invitationCode: string;
   // token is not part of the body, it's for the header
 }
 
-interface CreateCheckoutSessionRequest extends CreateCheckoutSessionPayload {
+export interface CreateCheckoutSessionRequest extends CreateCheckoutSessionPayload {
   token?: string;
 }
 
-interface CreateCheckoutSessionResponse {
+export interface CreateCheckoutSessionResponse {
   // チェックアウトセッション作成後のレスポンス構造に合わせて定義
   // 例: sessionId: string, url: string
   [key: string]: any; // 実際のレスポンス構造に合わせて調整
@@ -86,7 +86,7 @@ export const createCheckoutSession = async (
   });
 };
 
-interface CreatePortalSessionResponse {
+export interface CreatePortalSessionResponse {
   // ポータルセッション作成後のレスポンス構造に合わせて定義
   // 例: url: string
   [key: string]: any; // 実際のレスポンス構造に合わせて調整

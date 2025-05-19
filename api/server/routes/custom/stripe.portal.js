@@ -22,9 +22,7 @@ router.post('/create-portal-session', requireJwtAuth, async (req, res) => {
     }
 
     // Create a customer portal session
-    const returnUrl =
-      process.env.STRIPE_CUSTOMER_PORTAL_RETURN_URL ||
-      `${process.env.APP_URL || process.env.CLIENT_URL}/settings`;
+    const returnUrl = process.env.DOMAIN_CLIENT;
 
     const session = await stripeService.createCustomerPortalSession(user, returnUrl);
 
@@ -58,7 +56,7 @@ router.post('/create-checkout-session', requireJwtAuth, async (req, res) => {
     }
 
     // Create success and cancel URLs
-    const baseUrl = process.env.APP_URL || process.env.CLIENT_URL;
+    const baseUrl = process.env.DOMAIN_CLIENT;
     const successUrl = `${baseUrl}/subscription/success`;
     const cancelUrl = `${baseUrl}/subscription/cancel`;
 

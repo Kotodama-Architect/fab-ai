@@ -10,6 +10,9 @@ const messageLimiters = require('./messageLimiters');
 const verifyEmailLimiter = require('./verifyEmailLimiter');
 const resetPasswordLimiter = require('./resetPasswordLimiter');
 
+const viewerLoginLimiter = require('./viewerLoginLimiter');
+const viewerRegisterLimiter = require('./viewerRegisterLimiter');
+
 module.exports = {
   ...uploadLimiters,
   ...importLimiters,
@@ -21,4 +24,6 @@ module.exports = {
   createSTTLimiters,
   verifyEmailLimiter,
   resetPasswordLimiter,
+  viewerLoginLimiter,
+  viewerRegisterLimiter,
 };

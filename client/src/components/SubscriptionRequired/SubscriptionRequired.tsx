@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Trans, useTranslation } from 'react-i18next';
-import { useMutation } from '@tanstack/react-query';
-import { createCheckoutSession } from '~/services/stripe';
+import { useCreateCheckoutSessionMutation } from '~/data-provider';
 import { Button, Spinner, Input } from '~/components/ui';
 import { useLocalize, useAuthContext } from '~/hooks';
 
@@ -34,36 +33,32 @@ const SubscriptionRequired = () => {
     window.history.replaceState({}, document.title);
   }, [location.state]);
 
-  const { mutate: createCheckout, isLoading: isCheckoutLoading } = useMutation(
-    (data: CreateCheckoutSessionData) => createCheckoutSession(data),
-    {
-      onSuccess: (data) => {
-        if (data && data.url) {
-          window.location.href = data.url;
-        }
-      },
-      onError: (err: any) => {
-        console.error('Create checkout session error:', err);
-        const message =
-          err?.response?.data?.message ||
-          err.message ||
-          t('com_ui_error_creating_checkout_session');
-        setError(message);
-        if (err?.response?.data?.message) {
-          setApiErrorMessage(err.response.data.message);
-        } else {
-          setApiErrorMessage('');
-        }
-        setIsLoading(false);
-      },
-      onMutate: () => {
-        setIsLoading(true);
-        setError('');
-        setApiErrorMessage('');
-      },
-      onSettled: () => {},
+  const { mutate: createCheckout, isLoading: isCheckoutLoading } = useCreateCheckoutSessionMutation({
+    onSuccess: (data) => {
+      if (data && data.url) {
+        window.location.href = data.url;
+      }
     },
-  );
+    onError: (err: any) => {
+      console.error('Create checkout session error:', err);
+      const message =
+        err?.response?.data?.message ||
+        err.message ||
+        t('com_ui_error_creating_checkout_session');
+      setError(message);
+      if (err?.response?.data?.message) {
+        setApiErrorMessage(err.response.data.message);
+      } else {
+        setApiErrorMessage('');
+      }
+      setIsLoading(false);
+    },
+    onMutate: () => {
+      setIsLoading(true);
+      setError('');
+      setApiErrorMessage('');
+    },
+  });
 
   const handleLogout = () => {
     logout('/login');

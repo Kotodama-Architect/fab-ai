@@ -17,6 +17,12 @@ import {
 import useUpdateTagsInConvo from '~/hooks/Conversations/useUpdateTagsInConvo';
 import { updateConversationTag } from '~/utils/conversationTags';
 import { useConversationTagsQuery } from './queries';
+import { createCheckoutSession, createPortalSession } from '~/services/stripe'; 
+import type {
+  CreateCheckoutSessionRequest,
+  CreateCheckoutSessionResponse,
+  CreatePortalSessionResponse,
+} from '~/services/stripe';
 
 export type TGenTitleMutation = UseMutationResult<
   t.TGenTitleResponse,
@@ -1025,4 +1031,47 @@ export const useAcceptTermsMutation = (
     onError: options?.onError,
     onMutate: options?.onMutate,
   });
+};
+
+export const useCreateCheckoutSessionMutation = (
+  options?: t.MutationOptions<
+    CreateCheckoutSessionResponse,
+    CreateCheckoutSessionRequest
+  >,
+): UseMutationResult<
+  CreateCheckoutSessionResponse,
+  unknown,
+  CreateCheckoutSessionRequest,
+  unknown
+> => {
+  const queryClient = useQueryClient();
+  return useMutation(
+    (payload: CreateCheckoutSessionRequest) => createCheckoutSession(payload),
+    {
+      onSuccess: (data, variables, context) => {
+        // Optionally invalidate queries or update cache here
+        options?.onSuccess?.(data, variables, context);
+      },
+      onError: options?.onError,
+      onMutate: options?.onMutate,
+      onSettled: options?.onSettled,
+    },
+  );
+};
+
+export const useCreatePortalSessionMutation = (
+  options?: t.MutationOptions<CreatePortalSessionResponse, { token?: string }>,
+): UseMutationResult<CreatePortalSessionResponse, unknown, { token?: string }, unknown> => {
+  const queryClient = useQueryClient();
+  return useMutation(
+    (payload: { token?: string }) => createPortalSession(payload.token),
+    {
+      onSuccess: (data, variables, context) => {
+        options?.onSuccess?.(data, variables, context);
+      },
+      onError: options?.onError,
+      onMutate: options?.onMutate,
+      onSettled: options?.onSettled,
+    },
+  );
 };

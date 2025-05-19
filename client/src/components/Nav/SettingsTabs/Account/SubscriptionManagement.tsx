@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useAuthContext } from '~/hooks';
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { getSubscriptionStatus, createPortalSession } from '~/services/stripe';
 import { Spinner, Button } from '~/components/ui';
 import { Trans, useTranslation } from 'react-i18next';
 import { SystemRoles } from 'librechat-data-provider';
-import { useGetSubscriptionStatusQuery, useCreateCheckoutSessionMutation } from '~/data-provider';
+import {
+  useGetSubscriptionStatusQuery,
+  useCreateCheckoutSessionMutation,
+  useCreatePortalSessionMutation,
+} from '~/data-provider';
 import { useLocalize } from '~/hooks';
 
 function SubscriptionManagement() {
@@ -18,13 +20,7 @@ function SubscriptionManagement() {
     data: subscriptionStatus,
     isLoading: isSubscriptionLoading,
     error,
-  } = useQuery(
-    ['subscriptionStatus', authToken],
-    () => getSubscriptionStatus(authToken),
-    {
-      enabled: !!authToken,
-    },
-  );
+  } = useGetSubscriptionStatusQuery(authToken, { enabled: !!authToken });
 
   const createPortalSession = useCreatePortalSessionMutation();
   const createCheckoutSession = useCreateCheckoutSessionMutation();
@@ -39,7 +35,7 @@ function SubscriptionManagement() {
         const result = await createCheckoutSession.mutateAsync({}); // No specific items, relies on default price or setup mode
         if (result?.sessionUrl) {
           window.location.href = result.sessionUrl;
-        }
+      }
       } else if (subscriptionStatus?.customerId) {
         // Existing customer (Admin or User) - go to portal
         const result = await createPortalSession.mutateAsync({});
@@ -67,7 +63,7 @@ function SubscriptionManagement() {
 
     if (subscriptionStatus.isActive !== undefined) {
       if (subscriptionStatus.isActive) {
-        const statusMap: Record<string, string> = {
+      const statusMap: Record<string, string> = {
           active: t('com_ui_status_active', 'Active'),
           trialing: t('com_ui_status_trialing', 'Trial'),
         };
@@ -79,7 +75,7 @@ function SubscriptionManagement() {
           unpaid: t('com_ui_status_unpaid', 'Unpaid'),
           incomplete: t('com_ui_status_incomplete', 'Incomplete'),
           incomplete_expired: t('com_ui_status_incomplete_expired', 'Expired'),
-        };
+      };
         return inactiveStatusMap[subscriptionStatus.status?.toLowerCase() ?? ''] || subscriptionStatus.status || t('com_ui_status_inactive', 'Inactive');
       }
     }
@@ -128,10 +124,10 @@ function SubscriptionManagement() {
   }
 
   if (isSubscriptionLoading && !subscriptionStatus) {
-    return (
+  return (
       <div className="flex h-20 items-center justify-center">
         <Spinner />
-      </div>
+        </div>
     );
   }
 
@@ -175,7 +171,7 @@ function SubscriptionManagement() {
           {subscriptionStatus?.status && subscriptionStatus.status !== 'canceled' && (
             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{localize('com_ui_subscription_status_notice', subscriptionStatus.status)}</p>
           )}
-        </div>
+      </div>
       )}
     </div>
   );

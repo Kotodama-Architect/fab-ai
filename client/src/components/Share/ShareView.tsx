@@ -1,6 +1,7 @@
-import { memo } from 'react';
-import { useParams } from 'react-router-dom';
+import { memo, useEffect } from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useGetSharedMessages } from 'librechat-data-provider/react-query';
+import type { TError } from 'librechat-data-provider';
 import { useLocalize, useDocumentTitle } from '~/hooks';
 import { useGetStartupConfig } from '~/data-provider';
 import { ShareContext } from '~/Providers';
@@ -13,7 +14,9 @@ function SharedView() {
   const localize = useLocalize();
   const { data: config } = useGetStartupConfig();
   const { shareId } = useParams();
-  const { data, isLoading } = useGetSharedMessages(shareId ?? '');
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { data, isLoading, isError, error } = useGetSharedMessages(shareId ?? '');
   const dataTree = data && buildTree({ messages: data.messages });
   const messagesTree = dataTree?.length === 0 ? null : dataTree ?? null;
 
@@ -26,6 +29,21 @@ function SharedView() {
   }
 
   useDocumentTitle(docTitle);
+
+  useEffect(() => {
+    if (isError && error) {
+      const apiError = error as TError;
+      const status = apiError?.status ?? apiError?.response?.data?.status;
+      if (
+        (status === 401 || status === 403) &&
+        config &&
+        config.allowSharedLinksPublic === false
+      ) {
+        sessionStorage.setItem('viewer_redirect_url', location.pathname + location.search);
+        navigate('/auth/viewer/login', { replace: true });
+      }
+    }
+  }, [isError, error, config, navigate, location]);
 
   let content: JSX.Element;
   if (isLoading) {
